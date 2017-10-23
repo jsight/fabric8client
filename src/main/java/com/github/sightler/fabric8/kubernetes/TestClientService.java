@@ -1,6 +1,9 @@
 package com.github.sightler.fabric8.kubernetes;
 
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServiceList;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.dsl.AppsAPIGroupDSL;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.api.model.ImageStreamList;
 import io.fabric8.openshift.client.DefaultOpenShiftClient;
@@ -28,13 +31,13 @@ public class TestClientService {
             if (!client.supportsOpenShiftAPIGroup(OpenShiftAPIGroups.IMAGE)) {
                 return "WARNING this cluster does not support the API Group " + OpenShiftAPIGroups.IMAGE;
             }
-            ImageStreamList list = client.imageStreams().list();
-            if (list == null) {
+            ServiceList serviceList = client.services().list();
+            if (serviceList == null) {
                 return "ERROR no list returned!";
             }
-            List<ImageStream> items = list.getItems();
-            for (ImageStream item : items) {
-                result.append("ImageStream " + item.getMetadata().getName() + " has version: " + item.getApiVersion() + System.lineSeparator());
+            List<Service> items = serviceList.getItems();
+            for (Service service : items) {
+                result.append("Service " + service.getMetadata().getName() + " has version: " + service.getApiVersion() + System.lineSeparator());
             }
             result.append("Found " + items.size() + " ImageStream(s)" + System.lineSeparator());
         } catch (KubernetesClientException e) {
