@@ -31,15 +31,25 @@ public class TestClientService {
             if (!client.supportsOpenShiftAPIGroup(OpenShiftAPIGroups.IMAGE)) {
                 return "WARNING this cluster does not support the API Group " + OpenShiftAPIGroups.IMAGE;
             }
+            ImageStreamList imageStreamList = client.imageStreams().list();
+            if (imageStreamList == null) {
+                return "ERROR no image stream list returned!";
+            }
+            List<ImageStream> imageStreams = imageStreamList.getItems();
+            for (ImageStream imageStream : imageStreams) {
+                result.append("Service " + imageStream.getMetadata().getName() + " has version: " + imageStream.getApiVersion() + System.lineSeparator());
+            }
+            result.append("Found " + imageStreams.size() + " imagestreams(s)" + System.lineSeparator());
+
             ServiceList serviceList = client.services().list();
             if (serviceList == null) {
-                return "ERROR no list returned!";
+                return "ERROR no service list returned!";
             }
-            List<Service> items = serviceList.getItems();
-            for (Service service : items) {
+            List<Service> services = serviceList.getItems();
+            for (Service service : services) {
                 result.append("Service " + service.getMetadata().getName() + " has version: " + service.getApiVersion() + System.lineSeparator());
             }
-            result.append("Found " + items.size() + " ImageStream(s)" + System.lineSeparator());
+            result.append("Found " + services.size() + " services(s)" + System.lineSeparator());
         } catch (KubernetesClientException e) {
             result.append("Failed: " + e);
             result.append(System.lineSeparator());
